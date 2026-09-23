@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Pedido } from '../types/database';
 
@@ -59,7 +59,6 @@ export function PainelAdmin() {
     }
   };
 
-  // Função para fazer upload do trabalho finalizado e gerar o link
   const enviarTrabalhoFinal = async (e: ChangeEvent<HTMLInputElement>, pedido: Pedido) => {
     const file = e.target.files?.[0];
     if (!file || !pedido.id) return;
@@ -71,21 +70,18 @@ export function PainelAdmin() {
       const fileName = `finalizado_${pedido.id}_${Date.now()}.${fileExt}`;
       const filePath = `trabalhos_prontos/${fileName}`;
 
-      // Upload para o bucket
       const { error: uploadError } = await supabase.storage
         .from('arquivos_pedidos')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      // Pega URL pública
       const { data: publicUrlData } = supabase.storage
         .from('arquivos_pedidos')
         .getPublicUrl(filePath);
 
       const finalUrl = publicUrlData.publicUrl;
 
-      // Atualiza o pedido no banco: salva URL final, marca como concluído e pago
       const { error: updateError } = await supabase
         .from('pedidos')
         .update({
@@ -105,7 +101,7 @@ export function PainelAdmin() {
         )
       );
 
-      alert('Trabalho final enviado com sucesso! O status foi atualizado para Concluído e Pago.');
+      alert('Trabalho final enviado com sucesso!');
     } catch (err: any) {
       alert(`Erro ao enviar arquivo final: ${err.message || err}`);
     } finally {
@@ -170,7 +166,6 @@ export function PainelAdmin() {
                 const whatsappTratado = (pedido.whatsapp ?? '').replace(/\D/g, '');
                 const estaPago = Boolean(pedido.pago);
 
-                // Mensagem pronta para o WhatsApp
                 const mensagemWhats = encodeURIComponent(
                   `Olá ${pedido.nome_cliente}! Seu serviço de PDF (${pedido.tipo_servico}) está pronto! 📄✨\n\nVocê pode baixar seu arquivo final no link:\n${pedido.arquivo_final_url}\n\nObrigado por utilizar o Socorro PDF!`
                 );
@@ -200,7 +195,6 @@ export function PainelAdmin() {
                       )}
                     </td>
 
-                    {/* Coluna de Entrega do Trabalho Final */}
                     <td style={{ padding: '12px 8px' }}>
                       {pedido.arquivo_final_url ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
