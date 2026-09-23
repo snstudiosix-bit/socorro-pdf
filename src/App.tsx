@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { LandingContador } from './components/LandingContador';
-import { ModeloPDF } from './components/ModeloPDF'; // <-- Novo componente iLovePDF
+import { ModuloPDF } from './components/ModeloPDF'; // Corrigido para ModuloPDF
 import { ServicosAdministrativos } from './components/ServicosAdministrativos';
 import { PainelAdmin } from './components/PainelAdmin';
 import { LoginAdmin } from './components/LoginAdmin';
@@ -61,7 +61,7 @@ export function App() {
           maxWidth: '1280px',
           margin: '0 auto',
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '12px'
@@ -87,7 +87,7 @@ export function App() {
               style={{
                 padding: '8px 14px',
                 background: pagina === 'contabilidade' ? 'var(--primary-gradient)' : 'transparent',
-                color: pagina === 'pdf' ? (pagina === 'contabilidade' ? '#ffffff' : '#4a5568') : '#ffffff',
+                color: pagina === 'contabilidade' ? '#ffffff' : (pagina === 'pdf' ? '#4a5568' : '#ffffff'),
                 border: pagina === 'contabilidade' ? 'none' : '1px solid var(--border-color)',
                 borderRadius: '20px',
                 cursor: 'pointer',
@@ -117,7 +117,7 @@ export function App() {
               style={{
                 padding: '8px 14px',
                 background: pagina === 'admin_servicos' ? 'var(--primary-gradient)' : 'transparent',
-                color: pagina === 'pdf' ? (pagina === 'admin_servicos' ? '#ffffff' : '#4a5568') : '#ffffff',
+                color: pagina === 'admin_servicos' ? '#ffffff' : (pagina === 'pdf' ? '#4a5568' : '#ffffff'),
                 border: pagina === 'admin_servicos' ? 'none' : '1px solid var(--border-color)',
                 borderRadius: '20px',
                 cursor: 'pointer',
@@ -171,8 +171,7 @@ export function App() {
           </div>
         )}
         
-        {/* Renderiza o novo ModuloPDF tipo iLovePDF */}
-        {pagina === 'pdf' && <ModeloPDF />}
+        {pagina === 'pdf' && <ModuloPDF />}
 
         {pagina === 'admin_servicos' && (
           <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
