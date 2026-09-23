@@ -1,34 +1,51 @@
-/* Efeito de transição suave em botões e cards */
-button, a {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M.A. Contabilidade & Serviços</title>
 
-button:hover, a:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-}
+    <!-- O CSS dentro do HTML precisa obrigatoriamente estar entre <style> e </style> -->
+    <style>
+      :root {
+        --bg-main: #0a0a0c;
+        --bg-card: #121217;
+        --border-color: #23232e;
+        --text-main: #ffffff;
+        --text-muted: #8e8ea0;
+        --primary: #6366f1;
+        --primary-gradient: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+        --radius: 16px;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
 
-/* Personalização da barra de rolagem (Scrollbar) no tema escuro */
-::-webkit-scrollbar {
-  width: 8px;
-}
+      * {
+        box-sizing: border-box;
+      }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-main);
-}
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
+      input, select, textarea {
+        background-color: #1a1a24 !important;
+        color: #ffffff !important;
+        border: 1px solid var(--border-color) !important;
+      }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
-}
-
-/* Foco amigável em campos de texto */
-input:focus, select:focus, textarea:focus {
-  outline: none !important;
-  border-color: #a855f7 !important;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.3) !important;
-}
+      input::placeholder, textarea::placeholder {
+        color: var(--text-muted) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
