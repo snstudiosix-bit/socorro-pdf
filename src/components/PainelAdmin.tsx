@@ -59,94 +59,124 @@ export function PainelAdmin() {
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>Painel de Administração - Pedidos</h2>
-        <button onClick={buscarPedidos} style={{ padding: '8px 16px', cursor: 'pointer' }}>
-          Atualizar Lista
+    <div style={{
+      backgroundColor: 'var(--bg-card)',
+      padding: '24px',
+      borderRadius: 'var(--radius)',
+      boxShadow: 'var(--shadow)',
+      border: '1px solid var(--border-color)'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Painel de Gestão</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Acompanhe e gira os pedidos recebidos</p>
+        </div>
+        <button
+          onClick={buscarPedidos}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: 'var(--bg-main)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 500
+          }}
+        >
+          🔄 Atualizar
         </button>
       </div>
 
-      {erro && <div style={{ color: 'red', marginBottom: '15px' }}>{erro}</div>}
+      {erro && (
+        <div style={{ padding: '12px', backgroundColor: '#fef2f2', color: '#991b1b', borderRadius: '8px', marginBottom: '16px', fontSize: '0.875rem' }}>
+          {erro}
+        </div>
+      )}
 
       {loading ? (
-        <p>A carregar pedidos...</p>
+        <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px 0' }}>A carregar pedidos...</p>
       ) : pedidos.length === 0 ? (
-        <p>Nenhum pedido encontrado.</p>
+        <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px 0' }}>Nenhum pedido encontrado.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }} border={1} cellPadding={8}>
-          <thead>
-            <tr style={{ backgroundColor: '#f0f0f0' }}>
-              <th>Cliente</th>
-              <th>WhatsApp</th>
-              <th>Serviço</th>
-              <th>Urgência</th>
-              <th>Arquivo</th>
-              <th>Status</th>
-              <th>Pago</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pedidos.map((pedido) => {
-              const idValido = pedido.id ?? '';
-              const whatsappTratado = pedido.whatsapp ?? '';
-              const whatsappNumero = whatsappTratado.replace(/\D/g, '');
-              const estaPago = Boolean(pedido.pago);
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-muted)' }}>
+                <th style={{ padding: '12px 8px' }}>Cliente</th>
+                <th style={{ padding: '12px 8px' }}>WhatsApp</th>
+                <th style={{ padding: '12px 8px' }}>Serviço</th>
+                <th style={{ padding: '12px 8px' }}>Ficheiro</th>
+                <th style={{ padding: '12px 8px' }}>Status</th>
+                <th style={{ padding: '12px 8px' }}>Pagamento</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pedidos.map((pedido) => {
+                const idValido = pedido.id ?? '';
+                const whatsappTratado = (pedido.whatsapp ?? '').replace(/\D/g, '');
+                const estaPago = Boolean(pedido.pago);
 
-              return (
-                <tr key={idValido || Math.random()}>
-                  <td>{pedido.nome_cliente}</td>
-                  <td>
-                    <a
-                      href={`https://wa.me/55${whatsappNumero}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {pedido.whatsapp || 'N/A'}
-                    </a>
-                  </td>
-                  <td>{pedido.tipo_servico}</td>
-                  <td>{pedido.urgencia}</td>
-                  <td>
-                    {pedido.arquivo_original_url ? (
-                      <a href={pedido.arquivo_original_url} target="_blank" rel="noreferrer">
-                        Ver Ficheiro
+                return (
+                  <tr key={idValido || Math.random()} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <td style={{ padding: '12px 8px', fontWeight: 600 }}>{pedido.nome_cliente}</td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <a href={`https://wa.me/55${whatsappTratado}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        💬 {pedido.whatsapp || 'N/A'}
                       </a>
-                    ) : (
-                      'Sem ficheiro'
-                    )}
-                  </td>
-                  <td>
-                    <select
-                      value={pedido.status}
-                      onChange={(e) => idValido && atualizarStatus(idValido, e.target.value)}
-                    >
-                      <option value="pendente">Pendente</option>
-                      <option value="em_andamento">Em Andamento</option>
-                      <option value="concluido">Concluído</option>
-                      <option value="cancelado">Cancelado</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button
-                      onClick={() => idValido && alternarPago(idValido, estaPago)}
-                      style={{
-                        backgroundColor: estaPago ? '#d4edda' : '#f8d7da',
-                        color: estaPago ? '#155724' : '#721c24',
-                        border: '1px solid',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {estaPago ? 'Pago' : 'Pendente'}
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <div>{pedido.tipo_servico}</div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{pedido.urgencia}</span>
+                    </td>
+                    <td style={{ padding: '12px 8px' }}>
+                      {pedido.arquivo_original_url ? (
+                        <a href={pedido.arquivo_original_url} target="_blank" rel="noreferrer" style={{ fontWeight: 500 }}>
+                          📎 Descarregar
+                        </a>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)' }}>Sem ficheiro</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <select
+                        value={pedido.status}
+                        onChange={(e) => idValido && atualizarStatus(idValido, e.target.value)}
+                        style={{
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          border: '1px solid var(--border-color)',
+                          backgroundColor: '#f8fafc',
+                          fontWeight: 500
+                        }}
+                      >
+                        <option value="pendente">Pendente</option>
+                        <option value="em_andamento">Em Andamento</option>
+                        <option value="concluido">Concluído</option>
+                        <option value="cancelado">Cancelado</option>
+                      </select>
+                    </td>
+                    <td style={{ padding: '12px 8px' }}>
+                      <button
+                        onClick={() => idValido && alternarPago(idValido, estaPago)}
+                        style={{
+                          backgroundColor: estaPago ? '#dcfce7' : '#fee2e2',
+                          color: estaPago ? '#166534' : '#991b1b',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '20px',
+                          fontWeight: 600,
+                          fontSize: '0.75rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {estaPago ? '✓ Pago' : '⏳ Pendente'}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
