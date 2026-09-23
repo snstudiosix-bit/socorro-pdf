@@ -88,12 +88,13 @@ export function PainelAdmin() {
           </thead>
           <tbody>
             {pedidos.map((pedido) => {
+              const idValido = pedido.id ?? '';
               const whatsappTratado = pedido.whatsapp ?? '';
               const whatsappNumero = whatsappTratado.replace(/\D/g, '');
               const estaPago = Boolean(pedido.pago);
 
               return (
-                <tr key={pedido.id}>
+                <tr key={idValido || Math.random()}>
                   <td>{pedido.nome_cliente}</td>
                   <td>
                     <a
@@ -118,7 +119,7 @@ export function PainelAdmin() {
                   <td>
                     <select
                       value={pedido.status}
-                      onChange={(e) => atualizarStatus(pedido.id, e.target.value)}
+                      onChange={(e) => idValido && atualizarStatus(idValido, e.target.value)}
                     >
                       <option value="pendente">Pendente</option>
                       <option value="em_andamento">Em Andamento</option>
@@ -128,7 +129,7 @@ export function PainelAdmin() {
                   </td>
                   <td>
                     <button
-                      onClick={() => alternarPago(pedido.id, estaPago)}
+                      onClick={() => idValido && alternarPago(idValido, estaPago)}
                       style={{
                         backgroundColor: estaPago ? '#d4edda' : '#f8d7da',
                         color: estaPago ? '#155724' : '#721c24',
