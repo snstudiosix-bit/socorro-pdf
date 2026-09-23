@@ -1,52 +1,86 @@
-:root {
-  /* Cores Neutras Institucionais */
-  --bg-main: #0f172a;          /* Slate Escuro Robusto */
-  --bg-card: #1e293b;          /* Grafite Elegante */
-  --bg-hover: #334155;
-  --border-color: #334155;      /* Linhas sutis e sóbrias */
-  
-  --text-main: #f8fafc;         /* Branco Off-white legível */
-  --text-muted: #94a3b8;        /* Cinza neutro suave */
-  
-  --primary: #3b82f6;           /* Azul Corporativo Confiável */
-  --primary-hover: #2563eb;
-  
-  --radius: 12px;
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M.A. Contabilidade & Serviços</title>
 
-* {
-  box-sizing: border-box;
-}
+    <!-- O CSS dentro do index.html precisa de estar entre as tags <style> -->
+    <style>
+      :root {
+        /* Cores Neutras Institucionais */
+        --bg-main: #0f172a;          /* Slate Escuro Robusto */
+        --bg-card: #1e293b;          /* Grafite Elegante */
+        --bg-hover: #334155;
+        --border-color: #334155;      /* Linhas sutis e sóbrias */
+        
+        --text-main: #f8fafc;         /* Branco Off-white legível */
+        --text-muted: #94a3b8;        /* Cinza neutro suave */
+        
+        --primary: #3b82f6;           /* Azul Corporativo Confiável */
+        --primary-hover: #2563eb;
+        
+        --radius: 12px;
+        --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      }
 
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-main);
-  color: var(--text-main);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+      * {
+        box-sizing: border-box;
+      }
 
-/* Formatações globais neutras para campos de entrada */
-input, select, textarea {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-  border: 1px solid var(--border-color) !important;
-  border-radius: 8px !important;
-}
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
 
-input::placeholder, textarea::placeholder {
-  color: var(--text-muted) !important;
-}
+      /* Formatações globais neutras para campos de entrada */
+      input, select, textarea {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+      }
 
-input:focus, select:focus, textarea:focus {
-  outline: none !important;
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
-}
+      input::placeholder, textarea::placeholder {
+        color: var(--text-muted) !important;
+      }
 
-button, a {
-  transition: all 0.2s ease-in-out;
-}
+      input:focus, select:focus, textarea:focus {
+        outline: none !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+      }
+
+      button, a {
+        transition: all 0.2s ease-in-out;
+      }
+
+      /* Scrollbar Personalizada */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg-main);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
