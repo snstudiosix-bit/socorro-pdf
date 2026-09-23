@@ -1,10 +1,48 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>socorro-pdf</title>
+    <title>M.A. Contabilidade & Serviços</title>
+
+    <!-- O CSS dentro do HTML precisa obrigatoriamente estar entre <style> e </style> -->
+    <style>
+      :root {
+        --bg-main: #0a0a0c;
+        --bg-card: #121217;
+        --border-color: #23232e;
+        --text-main: #ffffff;
+        --text-muted: #8e8ea0;
+        --primary: #6366f1;
+        --primary-gradient: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+        --radius: 16px;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      input, select, textarea {
+        background-color: #1a1a24 !important;
+        color: #ffffff !important;
+        border: 1px solid var(--border-color) !important;
+      }
+
+      input::placeholder, textarea::placeholder {
+        color: var(--text-muted) !important;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

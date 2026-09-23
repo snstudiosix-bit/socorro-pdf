@@ -4,11 +4,10 @@ export interface Pedido {
   nome_cliente: string;
   whatsapp: string;
   tipo_servico: string;
-  urgencia: string;
-  descricao: string;
-  arquivo_original_url?: string | null;
-  arquivo_pronto_url?: string | null;
-  status?: string;
-  valor?: number;
+  descricao?: string;
+  urgencia?: string;
   pago?: boolean;
+  status?: string;
+  arquivo_original_url?: string;
+  arquivo_final_url?: string;
 }
