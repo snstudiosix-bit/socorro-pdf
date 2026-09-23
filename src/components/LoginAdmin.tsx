@@ -27,14 +27,15 @@ export function LoginAdmin({ onLoginSucesso }: LoginAdminProps) {
 
     try {
       if (modo === 'cadastro') {
+        // Corrigido 'senha' para 'password'
         const { error } = await supabase.auth.signUp({
           email,
-          senha,
+          password: senha,
         });
 
         if (error) throw error;
 
-        setMensagem('Conta criada com sucesso! Se necessário, confirme o e-mail ou faça login.');
+        setMensagem('Conta criada com sucesso! Verifique o seu e-mail para confirmar.');
         setModo('login');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -86,7 +87,6 @@ export function LoginAdmin({ onLoginSucesso }: LoginAdminProps) {
         {modo === 'login' ? 'Entre para continuar no Socorro PDF' : 'Crie sua conta para enviar pedidos'}
       </p>
 
-      {/* Botão de Conectar com o Google */}
       <button
         type="button"
         onClick={handleGoogleLogin}
