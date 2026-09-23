@@ -1,6 +1,11 @@
-
+import { useState } from 'react';
 import type { FerramentaPDF } from '../types/pdf';
 import { FERRAMENTAS_PDF } from '../data/ferramentas';
+import { 
+  Combine, Split, Trash2, FileOutput, ArrowUpDown, Minimize2, Wrench, ScanText, 
+  Image, FileText, Presentation, Code, FileImage, Table, RotateCw, Hash, 
+  Stamp, Edit3, Unlock, Lock, PenTool, Sparkles, Languages, CheckCircle, Download, RefreshCw
+} from 'lucide-react';
 
 const iconeMap: Record<string, any> = {
   Combine, Split, Trash2, FileOutput, ArrowUpDown, Minimize2, Wrench, ScanText,
@@ -64,7 +69,6 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
     }
   };
 
-  // Simulação do Fluxo de Carregamento e Processamento
   const handleIniciarProcessamento = () => {
     if (ficheiros.length === 0) return;
 
@@ -89,7 +93,6 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
       } else {
         clearInterval(interval);
         
-        // Cria um ficheiro blob simulado para descarregamento
         const blob = new Blob([ficheiros[0]], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         setFicheiroGeradoUrl(url);
@@ -199,7 +202,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
         ))}
       </div>
 
-      {/* Modal Interativo com Estado de Seleção, Carregamento e Sucesso */}
+      {/* Modal Interativo */}
       {ferramentaSelecionada && (
         <div style={{ 
           position: 'fixed', 
@@ -268,7 +271,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                       <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', margin: '0 0 6px 0' }}>
                         Ficheiro(s) Selecionado(s):
                       </p>
-                      {ficheiros.map((f, idx) => (
+                      {ficheiros.map((f: File, idx: number) => (
                         <p key={idx} style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0' }}>
                           📄 {f.name} ({(f.size / (1024 * 1024)).toFixed(2)} MB)
                         </p>
@@ -319,7 +322,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
               </>
             )}
 
-            {/* ESTADO 2: Ecrã de Carregamento / Processamento */}
+            {/* ESTADO 2: Ecrã de Carregamento */}
             {aProcessar && (
               <div style={{ padding: '20px 0' }}>
                 <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
@@ -334,7 +337,6 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                   {mensagemStatus}
                 </p>
 
-                {/* Barra de Progresso Animada */}
                 <div style={{ 
                   width: '100%', 
                   backgroundColor: '#0f172a', 
@@ -409,7 +411,6 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
         </div>
       )}
 
-      {/* Keyframe CSS para a Animação do Spinner */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
