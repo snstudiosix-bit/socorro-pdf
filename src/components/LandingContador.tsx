@@ -3,7 +3,7 @@ interface LandingContadorProps {
 }
 
 export function LandingContador({ onIrParaPDF }: LandingContadorProps) {
-  const whatsappNumber = '5566999999999'; // Substitua pelo seu número
+  const whatsappNumber = '5566999856584';
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá! Gostaria de consultar os seus serviços de contabilidade.')}`;
 
   return (
