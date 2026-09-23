@@ -14,7 +14,7 @@ export function PainelAdmin() {
     const { data, error } = await supabase
       .from('pedidos')
       .select('*')
-      .order('criado_em', { ascending: false });
+      .order('created_at', { ascending
 
     if (error) {
       setErro(`Erro ao carregar pedidos: ${error.message}`);
