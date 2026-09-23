@@ -1,11 +1,6 @@
-import { useState, useEffect } from 'react';
+
 import type { FerramentaPDF } from '../types/pdf';
 import { FERRAMENTAS_PDF } from '../data/ferramentas';
-import { 
-  Combine, Split, Trash2, FileOutput, ArrowUpDown, Minimize2, Wrench, ScanText, 
-  Image, FileText, Presentation, Code, FileImage, Table, RotateCw, Hash, 
-  Stamp, Edit3, Unlock, Lock, PenTool, Sparkles, Languages, CheckCircle, Download, RefreshCw, AlertCircle
-} from 'lucide-react';
 
 const iconeMap: Record<string, any> = {
   Combine, Split, Trash2, FileOutput, ArrowUpDown, Minimize2, Wrench, ScanText,
