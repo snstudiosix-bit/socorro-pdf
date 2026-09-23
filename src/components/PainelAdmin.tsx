@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Pedido } from '../types/database';
 
 export function PainelAdmin() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [erro, setErro] = useState<string>('');
 
   const buscarPedidos = async () => {
@@ -58,6 +59,60 @@ export function PainelAdmin() {
     }
   };
 
+  // Função para fazer upload do trabalho finalizado e gerar o link
+  const enviarTrabalhoFinal = async (e: ChangeEvent<HTMLInputElement>, pedido: Pedido) => {
+    const file = e.target.files?.[0];
+    if (!file || !pedido.id) return;
+
+    setUploadingId(pedido.id);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `finalizado_${pedido.id}_${Date.now()}.${fileExt}`;
+      const filePath = `trabalhos_prontos/${fileName}`;
+
+      // Upload para o bucket
+      const { error: uploadError } = await supabase.storage
+        .from('arquivos_pedidos')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      // Pega URL pública
+      const { data: publicUrlData } = supabase.storage
+        .from('arquivos_pedidos')
+        .getPublicUrl(filePath);
+
+      const finalUrl = publicUrlData.publicUrl;
+
+      // Atualiza o pedido no banco: salva URL final, marca como concluído e pago
+      const { error: updateError } = await supabase
+        .from('pedidos')
+        .update({
+          arquivo_final_url: finalUrl,
+          status: 'concluido',
+          pago: true
+        })
+        .eq('id', pedido.id);
+
+      if (updateError) throw updateError;
+
+      setPedidos((prev) =>
+        prev.map((p) =>
+          p.id === pedido.id
+            ? { ...p, arquivo_final_url: finalUrl, status: 'concluido', pago: true }
+            : p
+        )
+      );
+
+      alert('Trabalho final enviado com sucesso! O status foi atualizado para Concluído e Pago.');
+    } catch (err: any) {
+      alert(`Erro ao enviar arquivo final: ${err.message || err}`);
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
   return (
     <div style={{
       backgroundColor: 'var(--bg-card)',
@@ -69,7 +124,7 @@ export function PainelAdmin() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Painel de Gestão</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Acompanhe e gira os pedidos recebidos</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Acompanhe, finalize e entregue os pedidos</p>
         </div>
         <button
           onClick={buscarPedidos}
@@ -102,9 +157,9 @@ export function PainelAdmin() {
             <thead>
               <tr style={{ borderBottom: '2px solid var(--border-color)', color: 'var(--text-muted)' }}>
                 <th style={{ padding: '12px 8px' }}>Cliente</th>
-                <th style={{ padding: '12px 8px' }}>WhatsApp</th>
                 <th style={{ padding: '12px 8px' }}>Serviço</th>
-                <th style={{ padding: '12px 8px' }}>Ficheiro</th>
+                <th style={{ padding: '12px 8px' }}>Original</th>
+                <th style={{ padding: '12px 8px' }}>Entrega Final</th>
                 <th style={{ padding: '12px 8px' }}>Status</th>
                 <th style={{ padding: '12px 8px' }}>Pagamento</th>
               </tr>
@@ -115,27 +170,85 @@ export function PainelAdmin() {
                 const whatsappTratado = (pedido.whatsapp ?? '').replace(/\D/g, '');
                 const estaPago = Boolean(pedido.pago);
 
+                // Mensagem pronta para o WhatsApp
+                const mensagemWhats = encodeURIComponent(
+                  `Olá ${pedido.nome_cliente}! Seu serviço de PDF (${pedido.tipo_servico}) está pronto! 📄✨\n\nVocê pode baixar seu arquivo final no link:\n${pedido.arquivo_final_url}\n\nObrigado por utilizar o Socorro PDF!`
+                );
+                const linkWhatsApp = `https://wa.me/55${whatsappTratado}?text=${mensagemWhats}`;
+
                 return (
                   <tr key={idValido || Math.random()} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '12px 8px', fontWeight: 600 }}>{pedido.nome_cliente}</td>
                     <td style={{ padding: '12px 8px' }}>
-                      <a href={`https://wa.me/55${whatsappTratado}`} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        💬 {pedido.whatsapp || 'N/A'}
+                      <div style={{ fontWeight: 600 }}>{pedido.nome_cliente}</div>
+                      <a href={`https://wa.me/55${whatsappTratado}`} target="_blank" rel="noreferrer" style={{ fontSize: '0.75rem', color: '#16a34a' }}>
+                        💬 WhatsApp
                       </a>
                     </td>
+
                     <td style={{ padding: '12px 8px' }}>
                       <div>{pedido.tipo_servico}</div>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{pedido.urgencia}</span>
                     </td>
+
                     <td style={{ padding: '12px 8px' }}>
                       {pedido.arquivo_original_url ? (
                         <a href={pedido.arquivo_original_url} target="_blank" rel="noreferrer" style={{ fontWeight: 500 }}>
-                          📎 Descarregar
+                          📎 Original
                         </a>
                       ) : (
-                        <span style={{ color: 'var(--text-muted)' }}>Sem ficheiro</span>
+                        <span style={{ color: 'var(--text-muted)' }}>Sem arquivo</span>
                       )}
                     </td>
+
+                    {/* Coluna de Entrega do Trabalho Final */}
+                    <td style={{ padding: '12px 8px' }}>
+                      {pedido.arquivo_final_url ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <a href={pedido.arquivo_final_url} target="_blank" rel="noreferrer" style={{ color: '#2563eb', fontWeight: 600 }}>
+                            ✅ Baixar Final
+                          </a>
+                          <a
+                            href={linkWhatsApp}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              backgroundColor: '#25d366',
+                              color: '#ffffff',
+                              padding: '4px 8px',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
+                              textAlign: 'center',
+                              fontWeight: 600,
+                              display: 'inline-block'
+                            }}
+                          >
+                            🚀 Entregar via Zap
+                          </a>
+                        </div>
+                      ) : (
+                        <div>
+                          <label style={{
+                            backgroundColor: 'var(--primary)',
+                            color: '#fff',
+                            padding: '6px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.75rem',
+                            cursor: 'pointer',
+                            display: 'inline-block',
+                            fontWeight: 500
+                          }}>
+                            {uploadingId === idValido ? 'A carregar...' : '📤 Enviar Pronto'}
+                            <input
+                              type="file"
+                              onChange={(e) => enviarTrabalhoFinal(e, pedido)}
+                              style={{ display: 'none' }}
+                              disabled={uploadingId === idValido}
+                            />
+                          </label>
+                        </div>
+                      )}
+                    </td>
+
                     <td style={{ padding: '12px 8px' }}>
                       <select
                         value={pedido.status}
@@ -154,6 +267,7 @@ export function PainelAdmin() {
                         <option value="cancelado">Cancelado</option>
                       </select>
                     </td>
+
                     <td style={{ padding: '12px 8px' }}>
                       <button
                         onClick={() => idValido && alternarPago(idValido, estaPago)}
