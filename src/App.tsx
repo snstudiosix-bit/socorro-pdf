@@ -7,7 +7,7 @@ export function App() {
 
   return (
     <div>
-      <nav style={{ display: 'flex', gap: '10px', padding: '15px', backgroundColor: '#1a1a1a', color: '#fff' }}>
+      <nav style={{ display: 'flex', gap: '10px', padding: '12px 20px', backgroundColor: '#1a1a1a', justifyContent: 'center' }}>
         <button
           onClick={() => setPagina('formulario')}
           style={{
@@ -15,8 +15,9 @@ export function App() {
             backgroundColor: pagina === 'formulario' ? '#0070f3' : '#333',
             color: '#fff',
             border: 'none',
-            borderRadius: '4px',
+            borderRadius: '6px',
             cursor: 'pointer',
+            fontWeight: 'bold'
           }}
         >
           Novo Pedido
@@ -28,8 +29,9 @@ export function App() {
             backgroundColor: pagina === 'admin' ? '#0070f3' : '#333',
             color: '#fff',
             border: 'none',
-            borderRadius: '4px',
+            borderRadius: '6px',
             cursor: 'pointer',
+            fontWeight: 'bold'
           }}
         >
           Painel Admin
