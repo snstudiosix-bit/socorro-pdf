@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { Pedido } from '../types/database';
 
@@ -7,7 +7,6 @@ export function PainelAdmin() {
   const [loading, setLoading] = useState<boolean>(true);
   const [erro, setErro] = useState<string>('');
 
-  // Carregar lista de pedidos do Supabase
   const buscarPedidos = async () => {
     setLoading(true);
     setErro('');
@@ -29,7 +28,6 @@ export function PainelAdmin() {
     buscarPedidos();
   }, []);
 
-  // Atualizar o status do pedido
   const atualizarStatus = async (id: string, novoStatus: string) => {
     const { error } = await supabase
       .from('pedidos')
@@ -45,7 +43,6 @@ export function PainelAdmin() {
     }
   };
 
-  // Alternar estado de pagamento
   const alternarPago = async (id: string, pagoAtual: boolean) => {
     const { error } = await supabase
       .from('pedidos')
@@ -90,57 +87,62 @@ export function PainelAdmin() {
             </tr>
           </thead>
           <tbody>
-            {pedidos.map((pedido) => (
-              <tr key={pedido.id}>
-                <td>{pedido.nome_cliente}</td>
-                <td>
-                  <a
-                    href={`https://wa.me/55${pedido.whatsapp.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {pedido.whatsapp}
-                  </a>
-                </td>
-                <td>{pedido.tipo_servico}</td>
-                <td>{pedido.urgencia}</td>
-                <td>
-                  {pedido.arquivo_original_url ? (
-                    <a href={pedido.arquivo_original_url} target="_blank" rel="noreferrer">
-                      Ver Ficheiro
+            {pedidos.map((pedido) => {
+              const whatsappNumero = (pedido.whatsapp || '').replace(/\D/g, '');
+              const estaPago = Boolean(pedido.pago);
+
+              return (
+                <tr key={pedido.id}>
+                  <td>{pedido.nome_cliente}</td>
+                  <td>
+                    <a
+                      href={`https://wa.me/55${whatsappNumero}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {pedido.whatsapp || 'N/A'}
                     </a>
-                  ) : (
-                    'Sem ficheiro'
-                  )}
-                </td>
-                <td>
-                  <select
-                    value={pedido.status}
-                    onChange={(e) => atualizarStatus(pedido.id, e.target.value)}
-                  >
-                    <option value="pendente">Pendente</option>
-                    <option value="em_andamento">Em Andamento</option>
-                    <option value="concluido">Concluído</option>
-                    <option value="cancelado">Cancelado</option>
-                  </select>
-                </td>
-                <td>
-                  <button
-                    onClick={() => alternarPago(pedido.id, pedido.pago)}
-                    style={{
-                      backgroundColor: pedido.pago ? '#d4edda' : '#f8d7da',
-                      color: pedido.pago ? '#155724' : '#721c24',
-                      border: '1px solid',
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {pedido.pago ? 'Pago' : 'Pendente'}
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>{pedido.tipo_servico}</td>
+                  <td>{pedido.urgencia}</td>
+                  <td>
+                    {pedido.arquivo_original_url ? (
+                      <a href={pedido.arquivo_original_url} target="_blank" rel="noreferrer">
+                        Ver Ficheiro
+                      </a>
+                    ) : (
+                      'Sem ficheiro'
+                    )}
+                  </td>
+                  <td>
+                    <select
+                      value={pedido.status}
+                      onChange={(e) => atualizarStatus(pedido.id, e.target.value)}
+                    >
+                      <option value="pendente">Pendente</option>
+                      <option value="em_andamento">Em Andamento</option>
+                      <option value="concluido">Concluído</option>
+                      <option value="cancelado">Cancelado</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => alternarPago(pedido.id, estaPago)}
+                      style={{
+                        backgroundColor: estaPago ? '#d4edda' : '#f8d7da',
+                        color: estaPago ? '#155724' : '#721c24',
+                        border: '1px solid',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {estaPago ? 'Pago' : 'Pendente'}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}
