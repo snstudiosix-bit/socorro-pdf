@@ -10,18 +10,21 @@ export function App() {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [carregando, setCarregando] = useState<boolean>(true);
 
+  // Define o e-mail do Administrador do sistema
+  const EMAIL_ADMIN = 'snstudiosix@gmail.com';
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const user = session?.user ?? null;
       setUsuario(user);
-      setIsAdmin(user?.email === 'admin@socorropdf.com');
+      setIsAdmin(user?.email?.toLowerCase() === EMAIL_ADMIN.toLowerCase());
       setCarregando(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user ?? null;
       setUsuario(user);
-      setIsAdmin(user?.email === 'admin@socorropdf.com');
+      setIsAdmin(user?.email?.toLowerCase() === EMAIL_ADMIN.toLowerCase());
       setCarregando(false);
     });
 
@@ -34,7 +37,7 @@ export function App() {
   };
 
   if (carregando) {
-    return <p style={{ textAlign: 'center', padding: '40px' }}>A carregar...</p>;
+    return <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>A carregar...</p>;
   }
 
   if (!usuario) {
@@ -56,7 +59,7 @@ export function App() {
           maxWidth: '1000px',
           margin: '0 auto',
           display: 'flex',
-          justifyContent: 'space-between',
+          justify: 'space-between',
           alignItems: 'center'
         }}>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>
