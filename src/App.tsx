@@ -49,14 +49,14 @@ export function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Header / Navbar */}
       <header style={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid var(--border-color)',
-        padding: '16px 20px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}>
+  backgroundColor: 'rgba(10, 10, 12, 0.8)',
+  backdropFilter: 'blur(12px)',
+  borderBottom: '1px solid var(--border-color)',
+  padding: '16px 20px',
+  position: 'sticky',
+  top: 0,
+  zIndex: 10
+}}>
         <div style={{
           maxWidth: '1100px',
           margin: '0 auto',
