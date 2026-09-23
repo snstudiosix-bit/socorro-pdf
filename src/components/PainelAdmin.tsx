@@ -88,7 +88,8 @@ export function PainelAdmin() {
           </thead>
           <tbody>
             {pedidos.map((pedido) => {
-              const whatsappNumero = (pedido.whatsapp || '').replace(/\D/g, '');
+              const whatsappTratado = pedido.whatsapp ?? '';
+              const whatsappNumero = whatsappTratado.replace(/\D/g, '');
               const estaPago = Boolean(pedido.pago);
 
               return (
