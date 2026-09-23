@@ -46,17 +46,17 @@ export function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header / Navbar */}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
+      {/* Header / Navbar Glassmorphism */}
       <header style={{
-  backgroundColor: 'rgba(10, 10, 12, 0.8)',
-  backdropFilter: 'blur(12px)',
-  borderBottom: '1px solid var(--border-color)',
-  padding: '16px 20px',
-  position: 'sticky',
-  top: 0,
-  zIndex: 10
-}}>
+        backgroundColor: 'rgba(10, 10, 12, 0.8)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid var(--border-color)',
+        padding: '16px 20px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10
+      }}>
         <div style={{
           maxWidth: '1100px',
           margin: '0 auto',
@@ -68,7 +68,14 @@ export function App() {
         }}>
           <h1 
             onClick={() => setPagina('contabilidade')}
-            style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', cursor: 'pointer' }}
+            style={{ 
+              fontSize: '1.25rem', 
+              fontWeight: 700, 
+              background: 'var(--primary-gradient)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              cursor: 'pointer' 
+            }}
           >
             📊 M.A. Contabilidade & Serviços
           </h1>
@@ -78,10 +85,10 @@ export function App() {
               onClick={() => setPagina('contabilidade')}
               style={{
                 padding: '8px 14px',
-                backgroundColor: pagina === 'contabilidade' ? 'var(--primary)' : 'transparent',
-                color: pagina === 'contabilidade' ? '#ffffff' : 'var(--text-muted)',
+                background: pagina === 'contabilidade' ? 'var(--primary-gradient)' : 'transparent',
+                color: '#ffffff',
                 border: pagina === 'contabilidade' ? 'none' : '1px solid var(--border-color)',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 cursor: 'pointer',
                 fontWeight: 600
               }}
@@ -93,10 +100,10 @@ export function App() {
               onClick={() => setPagina('pdf')}
               style={{
                 padding: '8px 14px',
-                backgroundColor: pagina === 'pdf' ? 'var(--primary)' : 'transparent',
-                color: pagina === 'pdf' ? '#ffffff' : 'var(--text-muted)',
+                background: pagina === 'pdf' ? 'var(--primary-gradient)' : 'transparent',
+                color: '#ffffff',
                 border: pagina === 'pdf' ? 'none' : '1px solid var(--border-color)',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 cursor: 'pointer',
                 fontWeight: 600
               }}
@@ -108,10 +115,10 @@ export function App() {
               onClick={() => setPagina('admin_servicos')}
               style={{
                 padding: '8px 14px',
-                backgroundColor: pagina === 'admin_servicos' ? 'var(--primary)' : 'transparent',
-                color: pagina === 'admin_servicos' ? '#ffffff' : 'var(--text-muted)',
+                background: pagina === 'admin_servicos' ? 'var(--primary-gradient)' : 'transparent',
+                color: '#ffffff',
                 border: pagina === 'admin_servicos' ? 'none' : '1px solid var(--border-color)',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 cursor: 'pointer',
                 fontWeight: 600
               }}
@@ -124,10 +131,10 @@ export function App() {
                 onClick={() => setPagina('admin')}
                 style={{
                   padding: '8px 14px',
-                  backgroundColor: pagina === 'admin' ? '#1e293b' : 'transparent',
-                  color: pagina === 'admin' ? '#ffffff' : 'var(--text-muted)',
-                  border: pagina === 'admin' ? 'none' : '1px solid var(--border-color)',
-                  borderRadius: '8px',
+                  backgroundColor: pagina === 'admin' ? '#23232e' : 'transparent',
+                  color: '#ffffff',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '20px',
                   cursor: 'pointer',
                   fontWeight: 600
                 }}
@@ -140,10 +147,10 @@ export function App() {
               onClick={handleSair}
               style={{
                 padding: '8px 12px',
-                backgroundColor: '#fee2e2',
-                color: '#991b1b',
-                border: 'none',
-                borderRadius: '8px',
+                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                color: '#f87171',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '20px',
                 cursor: 'pointer',
                 fontWeight: 600,
                 fontSize: '0.875rem'
