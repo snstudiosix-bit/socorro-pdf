@@ -61,7 +61,7 @@ export function App() {
           maxWidth: '1100px',
           margin: '0 auto',
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '12px'
