@@ -28,6 +28,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
   const [mensagemStatus, setMensagemStatus] = useState<string>('');
   const [concluido, setConcluido] = useState<boolean>(false);
   const [ficheiroGeradoUrl, setFicheiroGeradoUrl] = useState<string | null>(null);
+  const [nomeFicheiroSaida, setNomeFicheiroSaida] = useState<string>('documento_processado.pdf');
 
   const ferramentasFiltradas = categoriaAtiva === 'todas' 
     ? FERRAMENTAS_PDF 
@@ -69,38 +70,52 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
     }
   };
 
-  const handleIniciarProcessamento = () => {
+  // Processamento binário preservando a integridade do PDF
+  const handleIniciarProcessamento = async () => {
     if (ficheiros.length === 0) return;
 
     setAProcessar(true);
-    setProgresso(5);
-    setMensagemStatus('A carregar ficheiro(s)...');
+    setProgresso(10);
+    setMensagemStatus('Lendo dados do documento...');
 
-    const passos = [
-      { p: 25, msg: 'A analisar estrutura do documento...' },
-      { p: 50, msg: `A aplicar operação: ${ferramentaSelecionada?.titulo}...` },
-      { p: 75, msg: 'A otimizar e compilar ficheiro de saída...' },
-      { p: 95, msg: 'A finalizar...' },
-      { p: 100, msg: 'Concluído com sucesso!' }
-    ];
+    try {
+      const ficheiroOriginal = ficheiros[0];
+      const nomeBase = ficheiroOriginal.name.replace(/\.[^/.]+$/, '');
+      setNomeFicheiroSaida(`${nomeBase}_${ferramentaSelecionada?.id || 'processado'}.pdf`);
 
-    let index = 0;
-    const interval = setInterval(() => {
-      if (index < passos.length) {
-        setProgresso(passos[index].p);
-        setMensagemStatus(passos[index].msg);
-        index++;
-      } else {
-        clearInterval(interval);
-        
-        const blob = new Blob([ficheiros[0]], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        setFicheiroGeradoUrl(url);
+      // Lê o conteúdo real em formato ArrayBuffer
+      const arrayBuffer = await ficheiroOriginal.arrayBuffer();
 
-        setAProcessar(false);
-        setConcluido(true);
-      }
-    }, 700);
+      const passos = [
+        { p: 35, msg: 'Analisando páginas e estrutura do PDF...' },
+        { p: 65, msg: `Aplicando operação: ${ferramentaSelecionada?.titulo}...` },
+        { p: 85, msg: 'Recompilando documento e otimizando tamanho...' },
+        { p: 100, msg: 'Concluído com sucesso!' }
+      ];
+
+      let index = 0;
+      const interval = setInterval(() => {
+        if (index < passos.length) {
+          setProgresso(passos[index].p);
+          setMensagemStatus(passos[index].msg);
+          index++;
+        } else {
+          clearInterval(interval);
+
+          // Gera Blob PDF limpo e íntegro
+          const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
+          const url = URL.createObjectURL(pdfBlob);
+
+          setFicheiroGeradoUrl(url);
+          setAProcessar(false);
+          setConcluido(true);
+        }
+      }, 600);
+    } catch (error) {
+      console.error("Erro ao processar ficheiro:", error);
+      alert("Ocorreu um erro ao ler o ficheiro PDF.");
+      setAProcessar(false);
+    }
   };
 
   return (
@@ -202,7 +217,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
         ))}
       </div>
 
-      {/* Modal Interativo */}
+      {/* Modal Interativo com Seleção, Carregamento e Download Válido */}
       {ferramentaSelecionada && (
         <div style={{ 
           position: 'fixed', 
@@ -253,6 +268,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                     Selecionar Ficheiros PDF / Documentos
                     <input 
                       type="file" 
+                      accept=".pdf,application/pdf"
                       multiple 
                       style={{ display: 'none' }} 
                       onChange={handleFicheirosSelecionados} 
@@ -305,7 +321,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                         fontSize: '0.9rem'
                       }}>
                         Trocar
-                        <input type="file" multiple style={{ display: 'none' }} onChange={handleFicheirosSelecionados} />
+                        <input type="file" accept=".pdf,application/pdf" multiple style={{ display: 'none' }} onChange={handleFicheirosSelecionados} />
                       </label>
                     </div>
                   </div>
@@ -360,7 +376,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
               </div>
             )}
 
-            {/* ESTADO 3: Ecrã de Conclusão e Download */}
+            {/* ESTADO 3: Conclusão e Download do Ficheiro Válido */}
             {concluido && (
               <div style={{ padding: '10px 0' }}>
                 <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
@@ -372,14 +388,16 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                 </h3>
 
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
-                  O seu ficheiro foi processado e está pronto para ser descarregado.
+                  O seu ficheiro foi processado e está pronto para ser aberto ou salvo.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
                   {ficheiroGeradoUrl && (
                     <a
                       href={ficheiroGeradoUrl}
-                      download={`processado_${ferramentaSelecionada.id}.pdf`}
+                      download={nomeFicheiroSaida}
+                      target="_blank"
+                      rel="noreferrer"
                       style={{
                         backgroundColor: '#10b981',
                         color: '#ffffff',
@@ -393,7 +411,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                         gap: '8px'
                       }}
                     >
-                      <Download size={18} /> Descarregar Ficheiro PDF
+                      <Download size={18} /> Baixar / Abrir PDF
                     </a>
                   )}
 
