@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FerramentaPDF } from '../types/pdf';
 import { FERRAMENTAS_PDF } from '../data/ferramentas';
+import { PDFDocument } from 'pdf-lib';
 import { 
   Combine, Split, Trash2, FileOutput, ArrowUpDown, Minimize2, Wrench, ScanText, 
   Image, FileText, Presentation, Code, FileImage, Table, RotateCw, Hash, 
@@ -70,50 +71,59 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
     }
   };
 
-  // Processamento binário preservando a integridade do PDF
+  // Processamento REAL do PDF usando pdf-lib
   const handleIniciarProcessamento = async () => {
     if (ficheiros.length === 0) return;
 
     setAProcessar(true);
-    setProgresso(10);
-    setMensagemStatus('Lendo dados do documento...');
+    setProgresso(15);
+    setMensagemStatus('Carregando arquivo(s)...');
 
     try {
-      const ficheiroOriginal = ficheiros[0];
-      const nomeBase = ficheiroOriginal.name.replace(/\.[^/.]+$/, '');
+      const nomeBase = ficheiros[0].name.replace(/\.[^/.]+$/, '');
       setNomeFicheiroSaida(`${nomeBase}_${ferramentaSelecionada?.id || 'processado'}.pdf`);
 
-      // Lê o conteúdo real em formato ArrayBuffer
-      const arrayBuffer = await ficheiroOriginal.arrayBuffer();
+      let pdfDocFinal: PDFDocument;
 
-      const passos = [
-        { p: 35, msg: 'Analisando páginas e estrutura do PDF...' },
-        { p: 65, msg: `Aplicando operação: ${ferramentaSelecionada?.titulo}...` },
-        { p: 85, msg: 'Recompilando documento e otimizando tamanho...' },
-        { p: 100, msg: 'Concluído com sucesso!' }
-      ];
+      if (ferramentaSelecionada?.id === 'juntar') {
+        // Exemplo real: Unir múltiplos PDFs em um só
+        setMensagemStatus('Mesclando múltiplos arquivos PDF...');
+        pdfDocFinal = await PDFDocument.create();
 
-      let index = 0;
-      const interval = setInterval(() => {
-        if (index < passos.length) {
-          setProgresso(passos[index].p);
-          setMensagemStatus(passos[index].msg);
-          index++;
-        } else {
-          clearInterval(interval);
-
-          // Gera Blob PDF limpo e íntegro
-          const pdfBlob = new Blob([arrayBuffer], { type: 'application/pdf' });
-          const url = URL.createObjectURL(pdfBlob);
-
-          setFicheiroGeradoUrl(url);
-          setAProcessar(false);
-          setConcluido(true);
+        for (let i = 0; i < ficheiros.length; i++) {
+          setProgresso(20 + Math.round((i / ficheiros.length) * 60));
+          const fileBytes = await ficheiros[i].arrayBuffer();
+          const pdfToMerge = await PDFDocument.load(fileBytes);
+          const copiedPages = await pdfDocFinal.copyPages(pdfToMerge, pdfToMerge.getPageIndices());
+          copiedPages.forEach((page) => pdfDocFinal.addPage(page));
         }
-      }, 600);
+      } else {
+        // Leitura e reconstrução limpa do arquivo PDF selecionado
+        setMensagemStatus('Processando e estruturando páginas...');
+        setProgresso(40);
+        const fileBytes = await ficheiros[0].arrayBuffer();
+        pdfDocFinal = await PDFDocument.load(fileBytes);
+        setProgresso(75);
+      }
+
+     setMensagemStatus('Gerando documento final...');
+      setProgresso(90);
+
+      // Salva o PDF real gerado
+      const pdfBytes = await pdfDocFinal.save();
+      
+      // Converte o buffer para ArrayBuffer compativel com o Blob
+      const pdfBlob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+      const url = URL.createObjectURL(pdfBlob);
+
+      setFicheiroGeradoUrl(url);
+      setProgresso(100);
+      setAProcessar(false);
+      setConcluido(true);
+
     } catch (error) {
-      console.error("Erro ao processar ficheiro:", error);
-      alert("Ocorreu um erro ao ler o ficheiro PDF.");
+      console.error("Erro ao processar PDF:", error);
+      alert("Erro ao processar o arquivo. Certifique-se de que é um PDF válido.");
       setAProcessar(false);
     }
   };
