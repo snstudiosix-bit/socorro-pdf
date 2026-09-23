@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { LandingContador } from './components/LandingContador';
-import { FormularioPedido } from './components/FormularioPedido';
+import { ModeloPDF } from './components/ModeloPDF'; // <-- Novo componente iLovePDF
 import { ServicosAdministrativos } from './components/ServicosAdministrativos';
 import { PainelAdmin } from './components/PainelAdmin';
 import { LoginAdmin } from './components/LoginAdmin';
@@ -46,22 +46,22 @@ export function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
-      {/* Header / Navbar Glassmorphism */}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: pagina === 'pdf' ? '#f8fafc' : 'var(--bg-main)' }}>
+      {/* Header / Navbar */}
       <header style={{
-        backgroundColor: 'rgba(10, 10, 12, 0.8)',
+        backgroundColor: pagina === 'pdf' ? '#ffffff' : 'rgba(10, 10, 12, 0.8)',
         backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--border-color)',
+        borderBottom: `1px solid ${pagina === 'pdf' ? '#e2e8f0' : 'var(--border-color)'}`,
         padding: '16px 20px',
         position: 'sticky',
         top: 0,
         zIndex: 10
       }}>
         <div style={{
-          maxWidth: '1100px',
+          maxWidth: '1280px',
           margin: '0 auto',
           display: 'flex',
-          justifyContent: 'space-between',
+          justify: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '12px'
@@ -71,9 +71,10 @@ export function App() {
             style={{ 
               fontSize: '1.25rem', 
               fontWeight: 700, 
-              background: 'var(--primary-gradient)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: pagina === 'pdf' ? '#1e293b' : 'transparent',
+              background: pagina === 'pdf' ? 'none' : 'var(--primary-gradient)',
+              WebkitBackgroundClip: pagina === 'pdf' ? 'unset' : 'text',
+              WebkitTextFillColor: pagina === 'pdf' ? '#1e293b' : 'transparent',
               cursor: 'pointer' 
             }}
           >
@@ -86,7 +87,7 @@ export function App() {
               style={{
                 padding: '8px 14px',
                 background: pagina === 'contabilidade' ? 'var(--primary-gradient)' : 'transparent',
-                color: '#ffffff',
+                color: pagina === 'pdf' ? (pagina === 'contabilidade' ? '#ffffff' : '#4a5568') : '#ffffff',
                 border: pagina === 'contabilidade' ? 'none' : '1px solid var(--border-color)',
                 borderRadius: '20px',
                 cursor: 'pointer',
@@ -100,7 +101,7 @@ export function App() {
               onClick={() => setPagina('pdf')}
               style={{
                 padding: '8px 14px',
-                background: pagina === 'pdf' ? 'var(--primary-gradient)' : 'transparent',
+                backgroundColor: pagina === 'pdf' ? '#e53e3e' : 'transparent',
                 color: '#ffffff',
                 border: pagina === 'pdf' ? 'none' : '1px solid var(--border-color)',
                 borderRadius: '20px',
@@ -108,7 +109,7 @@ export function App() {
                 fontWeight: 600
               }}
             >
-              Conversão de PDF
+              Ferramentas PDF
             </button>
 
             <button
@@ -116,7 +117,7 @@ export function App() {
               style={{
                 padding: '8px 14px',
                 background: pagina === 'admin_servicos' ? 'var(--primary-gradient)' : 'transparent',
-                color: '#ffffff',
+                color: pagina === 'pdf' ? (pagina === 'admin_servicos' ? '#ffffff' : '#4a5568') : '#ffffff',
                 border: pagina === 'admin_servicos' ? 'none' : '1px solid var(--border-color)',
                 borderRadius: '20px',
                 cursor: 'pointer',
@@ -132,7 +133,7 @@ export function App() {
                 style={{
                   padding: '8px 14px',
                   backgroundColor: pagina === 'admin' ? '#23232e' : 'transparent',
-                  color: '#ffffff',
+                  color: pagina === 'pdf' ? '#4a5568' : '#ffffff',
                   border: '1px solid var(--border-color)',
                   borderRadius: '20px',
                   cursor: 'pointer',
@@ -163,11 +164,27 @@ export function App() {
       </header>
 
       {/* Conteúdo Principal */}
-      <main style={{ flex: 1, maxWidth: '1100px', margin: '20px auto', padding: '0 16px', width: '100%' }}>
-        {pagina === 'contabilidade' && <LandingContador onIrParaPDF={() => setPagina('pdf')} />}
-        {pagina === 'pdf' && <FormularioPedido />}
-        {pagina === 'admin_servicos' && <ServicosAdministrativos />}
-        {pagina === 'admin' && isAdmin && <PainelAdmin />}
+      <main style={{ flex: 1, width: '100%' }}>
+        {pagina === 'contabilidade' && (
+          <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
+            <LandingContador onIrParaPDF={() => setPagina('pdf')} />
+          </div>
+        )}
+        
+        {/* Renderiza o novo ModuloPDF tipo iLovePDF */}
+        {pagina === 'pdf' && <ModeloPDF />}
+
+        {pagina === 'admin_servicos' && (
+          <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
+            <ServicosAdministrativos />
+          </div>
+        )}
+
+        {pagina === 'admin' && isAdmin && (
+          <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
+            <PainelAdmin />
+          </div>
+        )}
       </main>
     </div>
   );
