@@ -47,7 +47,7 @@ export function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
-      {/* Header Corporativo Sobrio */}
+      {/* Header Corporativo Sóbrio */}
       <header style={{
         backgroundColor: 'var(--bg-card)',
         borderBottom: '1px solid var(--border-color)',
@@ -60,7 +60,7 @@ export function App() {
           maxWidth: '1100px',
           margin: '0 auto',
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '12px'
