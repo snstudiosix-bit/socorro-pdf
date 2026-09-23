@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { LandingContador } from './components/LandingContador';
-import { ModuloPDF } from './components/ModeloPDF'; // Corrigido para ModuloPDF
+import { ModuloPDF } from './components/ModeloPDF';
 import { ServicosAdministrativos } from './components/ServicosAdministrativos';
 import { PainelAdmin } from './components/PainelAdmin';
 import { LoginAdmin } from './components/LoginAdmin';
@@ -38,7 +38,7 @@ export function App() {
   };
 
   if (carregando) {
-    return <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>A carregar...</p>;
+    return <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Carregando...</p>;
   }
 
   if (!usuario) {
@@ -46,22 +46,21 @@ export function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: pagina === 'pdf' ? '#f8fafc' : 'var(--bg-main)' }}>
-      {/* Header / Navbar */}
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-main)' }}>
+      {/* Header Corporativo Sobrio */}
       <header style={{
-        backgroundColor: pagina === 'pdf' ? '#ffffff' : 'rgba(10, 10, 12, 0.8)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: `1px solid ${pagina === 'pdf' ? '#e2e8f0' : 'var(--border-color)'}`,
-        padding: '16px 20px',
+        backgroundColor: 'var(--bg-card)',
+        borderBottom: '1px solid var(--border-color)',
+        padding: '14px 20px',
         position: 'sticky',
         top: 0,
         zIndex: 10
       }}>
         <div style={{
-          maxWidth: '1280px',
+          maxWidth: '1100px',
           margin: '0 auto',
           display: 'flex',
-          justifyContent: 'space-between',
+          justify: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '12px'
@@ -69,13 +68,11 @@ export function App() {
           <h1 
             onClick={() => setPagina('contabilidade')}
             style={{ 
-              fontSize: '1.25rem', 
+              fontSize: '1.15rem', 
               fontWeight: 700, 
-              color: pagina === 'pdf' ? '#1e293b' : 'transparent',
-              background: pagina === 'pdf' ? 'none' : 'var(--primary-gradient)',
-              WebkitBackgroundClip: pagina === 'pdf' ? 'unset' : 'text',
-              WebkitTextFillColor: pagina === 'pdf' ? '#1e293b' : 'transparent',
-              cursor: 'pointer' 
+              color: 'var(--text-main)',
+              cursor: 'pointer',
+              margin: 0
             }}
           >
             📊 M.A. Contabilidade & Serviços
@@ -85,13 +82,14 @@ export function App() {
             <button
               onClick={() => setPagina('contabilidade')}
               style={{
-                padding: '8px 14px',
-                background: pagina === 'contabilidade' ? 'var(--primary-gradient)' : 'transparent',
-                color: pagina === 'contabilidade' ? '#ffffff' : (pagina === 'pdf' ? '#4a5568' : '#ffffff'),
+                padding: '8px 16px',
+                backgroundColor: pagina === 'contabilidade' ? 'var(--primary)' : 'transparent',
+                color: '#ffffff',
                 border: pagina === 'contabilidade' ? 'none' : '1px solid var(--border-color)',
-                borderRadius: '20px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: 600
+                fontWeight: 600,
+                fontSize: '0.875rem'
               }}
             >
               Contabilidade
@@ -100,13 +98,14 @@ export function App() {
             <button
               onClick={() => setPagina('pdf')}
               style={{
-                padding: '8px 14px',
-                backgroundColor: pagina === 'pdf' ? '#e53e3e' : 'transparent',
+                padding: '8px 16px',
+                backgroundColor: pagina === 'pdf' ? 'var(--primary)' : 'transparent',
                 color: '#ffffff',
                 border: pagina === 'pdf' ? 'none' : '1px solid var(--border-color)',
-                borderRadius: '20px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: 600
+                fontWeight: 600,
+                fontSize: '0.875rem'
               }}
             >
               Ferramentas PDF
@@ -115,13 +114,14 @@ export function App() {
             <button
               onClick={() => setPagina('admin_servicos')}
               style={{
-                padding: '8px 14px',
-                background: pagina === 'admin_servicos' ? 'var(--primary-gradient)' : 'transparent',
-                color: pagina === 'admin_servicos' ? '#ffffff' : (pagina === 'pdf' ? '#4a5568' : '#ffffff'),
+                padding: '8px 16px',
+                backgroundColor: pagina === 'admin_servicos' ? 'var(--primary)' : 'transparent',
+                color: '#ffffff',
                 border: pagina === 'admin_servicos' ? 'none' : '1px solid var(--border-color)',
-                borderRadius: '20px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: 600
+                fontWeight: 600,
+                fontSize: '0.875rem'
               }}
             >
               Serviços Administrativos
@@ -131,13 +131,14 @@ export function App() {
               <button
                 onClick={() => setPagina('admin')}
                 style={{
-                  padding: '8px 14px',
-                  backgroundColor: pagina === 'admin' ? '#23232e' : 'transparent',
-                  color: pagina === 'pdf' ? '#4a5568' : '#ffffff',
+                  padding: '8px 16px',
+                  backgroundColor: pagina === 'admin' ? '#334155' : 'transparent',
+                  color: '#ffffff',
                   border: '1px solid var(--border-color)',
-                  borderRadius: '20px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  fontSize: '0.875rem'
                 }}
               >
                 Painel Admin
@@ -147,14 +148,14 @@ export function App() {
             <button
               onClick={handleSair}
               style={{
-                padding: '8px 12px',
-                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                padding: '8px 14px',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 color: '#f87171',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                borderRadius: '20px',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: 600,
-                fontSize: '0.875rem'
+                fontSize: '0.85rem'
               }}
             >
               Sair
@@ -164,26 +165,11 @@ export function App() {
       </header>
 
       {/* Conteúdo Principal */}
-      <main style={{ flex: 1, width: '100%' }}>
-        {pagina === 'contabilidade' && (
-          <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
-            <LandingContador onIrParaPDF={() => setPagina('pdf')} />
-          </div>
-        )}
-        
+      <main style={{ flex: 1, maxWidth: '1100px', margin: '24px auto', padding: '0 16px', width: '100%' }}>
+        {pagina === 'contabilidade' && <LandingContador onIrParaPDF={() => setPagina('pdf')} />}
         {pagina === 'pdf' && <ModuloPDF />}
-
-        {pagina === 'admin_servicos' && (
-          <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
-            <ServicosAdministrativos />
-          </div>
-        )}
-
-        {pagina === 'admin' && isAdmin && (
-          <div style={{ maxWidth: '1100px', margin: '20px auto', padding: '0 16px' }}>
-            <PainelAdmin />
-          </div>
-        )}
+        {pagina === 'admin_servicos' && <ServicosAdministrativos />}
+        {pagina === 'admin' && isAdmin && <PainelAdmin />}
       </main>
     </div>
   );

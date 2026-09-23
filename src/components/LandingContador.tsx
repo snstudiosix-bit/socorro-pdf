@@ -3,140 +3,130 @@ interface LandingContadorProps {
 }
 
 export function LandingContador({ onIrParaPDF }: LandingContadorProps) {
-  const whatsappNumber = '5566999856584';
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá! Gostaria de consultar os seus serviços de contabilidade.')}`;
+  const whatsappNumber = '5566999999999'; // Insira seu número de atendimento
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Olá! Gostaria de consultar seus serviços de contabilidade.')}`;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', padding: '20px 0 60px' }}>
-      {/* Hero Section Principal */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', padding: '20px 0 60px' }}>
+      
+      {/* Hero Section Institucional */}
       <section style={{
-        position: 'relative',
-        backgroundColor: '#0d0d12',
-        padding: '64px 32px',
-        borderRadius: '24px',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        gap: '24px'
+        backgroundColor: 'var(--bg-card)',
+        padding: '56px 32px',
+        borderRadius: 'var(--radius)',
+        border: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow)',
+        textAlign: 'center',
+        maxWidth: '900px',
+        margin: '0 auto',
+        width: '100%'
       }}>
-        {/* Elemento Gráfico de Fundo (Glow / Efeito Neon) */}
-        <div style={{
-          position: 'absolute',
-          top: '-100px',
-          right: '-100px',
-          width: '350px',
-          height: '350px',
-          background: 'radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(59,130,246,0.1) 60%, rgba(0,0,0,0) 100%)',
-          filter: 'blur(50px)',
-          pointerEvents: 'none'
-        }} />
-
         <span style={{
-          fontSize: '0.875rem',
-          fontWeight: 600,
+          fontSize: '0.85rem',
+          fontWeight: 700,
           textTransform: 'uppercase',
-          letterSpacing: '2px',
-          color: '#a855f7'
+          letterSpacing: '1.5px',
+          color: 'var(--primary)',
+          display: 'block',
+          marginBottom: '12px'
         }}>
-          M.A. Contabilidade
+          Assessoria & Consultoria Contábil
         </span>
 
         <h1 style={{
-          fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
+          fontSize: 'clamp(2rem, 4vw, 3rem)',
           fontWeight: 800,
-          lineHeight: 1.1,
-          margin: 0,
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          maxWidth: '800px'
+          color: 'var(--text-main)',
+          lineHeight: 1.25,
+          margin: '0 0 16px 0'
         }}>
-          Soluções Contábeis & Gestão Financeira.
+          Soluções Contábeis & Gestão Financeira
         </h1>
 
         <p style={{
-          fontSize: '1.125rem',
+          fontSize: '1.1rem',
           color: 'var(--text-muted)',
-          maxWidth: '600px',
-          lineHeight: 1.6,
-          margin: 0
+          maxWidth: '680px',
+          margin: '0 auto 32px',
+          lineHeight: 1.6
         }}>
-          Organização fiscal completa, assessoria especializada para MEI, IRPF e consultoria administrativa estratégica para o seu negócio.
+          Acompanhamento fiscal especializado, regularização de empresas, declaração de IRPF e suporte administrativo estratégico para o crescimento seguro do seu negócio.
         </p>
 
-        {/* Botões de Ação com Estilo Neon */}
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginTop: '12px' }}>
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a
             href={whatsappLink}
             target="_blank"
             rel="noreferrer"
             style={{
-              padding: '14px 28px',
-              background: 'var(--primary-gradient)',
+              padding: '12px 28px',
+              backgroundColor: 'var(--primary)',
               color: '#ffffff',
-              borderRadius: '30px',
-              fontWeight: 700,
+              borderRadius: '8px',
+              fontWeight: 600,
               textDecoration: 'none',
-              boxShadow: '0 4px 20px rgba(168, 85, 247, 0.4)',
-              transition: 'transform 0.2s, boxShadow 0.2s'
+              fontSize: '0.95rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
-            Falar no WhatsApp
+            Falar com Contador
           </a>
 
           <button
             onClick={onIrParaPDF}
             style={{
-              padding: '14px 28px',
+              padding: '12px 28px',
               backgroundColor: 'transparent',
-              color: '#ffffff',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '30px',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
               fontWeight: 600,
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)'
+              fontSize: '0.95rem',
+              cursor: 'pointer'
             }}
           >
-            Serviços de PDF
+            Ferramentas de PDF
           </button>
         </div>
       </section>
 
-      {/* Grade de Cards de Serviços */}
-      <section style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.5px' }}>
-          Serviços Prestados
+      {/* Serviços Oferecidos */}
+      <section style={{ maxWidth: '900px', margin: '0 auto', width: '100%' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '24px', color: 'var(--text-main)' }}>
+          Especialidades Contábeis
         </h2>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
           gap: '20px'
         }}>
           <div style={cardStyle}>
-            <div style={iconBadgeStyle}>💼</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '12px 0 8px' }}>Assessoria MEI & Empresas</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '10px', color: 'var(--text-main)' }}>
+              💼 Assessoria para MEI & Empresas
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.5, margin: 0 }}>
               Abertura, regularização, emissão de guias DAS e alteração cadastral com acompanhamento contínuo.
             </p>
           </div>
 
           <div style={cardStyle}>
-            <div style={iconBadgeStyle}>📋</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '12px 0 8px' }}>Imposto de Renda (IRPF)</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
-              Elaboração rigorosa da declaração de ajuste anual, cruzamento de dados e consulta de malha fina.
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '10px', color: 'var(--text-main)' }}>
+              📋 Imposto de Renda (IRPF)
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.5, margin: 0 }}>
+              Elaboração rigorosa da declaração de ajuste anual, análise de deduções e consulta de pendências.
             </p>
           </div>
 
           <div style={cardStyle}>
-            <div style={iconBadgeStyle}>📊</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '12px 0 8px' }}>Gestão & Consultoria</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.5, margin: 0 }}>
-              Conciliação bancária, relatórios de fluxo de caixa e suporte na tomada de decisões estratégicas.
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '10px', color: 'var(--text-main)' }}>
+              📊 Gestão Financeira & Relatórios
+            </h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.5, margin: 0 }}>
+              Organização do fluxo de caixa, conciliação bancária e demonstrativos organizados para tomada de decisão.
             </p>
           </div>
         </div>
@@ -147,23 +137,8 @@ export function LandingContador({ onIrParaPDF }: LandingContadorProps) {
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: 'var(--bg-card)',
-  padding: '32px 24px',
-  borderRadius: '20px',
+  padding: '28px 24px',
+  borderRadius: 'var(--radius)',
   border: '1px solid var(--border-color)',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
   boxShadow: 'var(--shadow)'
-};
-
-const iconBadgeStyle: React.CSSProperties = {
-  width: '48px',
-  height: '48px',
-  borderRadius: '12px',
-  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '1.25rem',
-  border: '1px solid rgba(255, 255, 255, 0.1)'
 };
