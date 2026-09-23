@@ -125,7 +125,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
         let page = pdfDoc.addPage([595.28, 841.89]);
         const { height } = page.getSize();
 
-        page.drawText('M.A. Contabilidade & Serviços', { x: 40, y: height - 40, size: 14, font: fontBold, color: rgb(0.23, 0.51, 0.96) });
+        page.drawText('GRUPO SNX & SOLUÇÕES ADMINISTRATIVAS', { x: 40, y: height - 40, size: 14, font: fontBold, color: rgb(0.23, 0.51, 0.96) });
         page.drawText(`Planilha: ${ficheiroOriginal.name} | Aba: ${sheetName}`, { x: 40, y: height - 58, size: 10, font: fontRegular, color: rgb(0.58, 0.64, 0.72) });
 
         let currentY = height - 90;

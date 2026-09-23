@@ -75,7 +75,7 @@ export function App() {
               margin: 0
             }}
           >
-            📊 M.A. Contabilidade & Serviços
+            GRUPO SNX & SOLUÇÕES ADMINISTRATIVAS
           </h1>
 
           <nav style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
