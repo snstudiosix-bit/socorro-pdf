@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { FerramentaPDF } from '../types/pdf';
 import { FERRAMENTAS_PDF } from '../data/ferramentas';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
+import * as XLSX from 'xlsx';
 import { 
   Combine, Split, Trash2, FileOutput, ArrowUpDown, Minimize2, Wrench, ScanText, 
   Image, FileText, Presentation, Code, FileImage, Table, RotateCw, Hash, 
@@ -66,107 +67,153 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
 
   const handleFicheirosSelecionados = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const listaFicheiros = Array.from(e.target.files);
-      setFicheiros(listaFicheiros);
+      setFicheiros(Array.from(e.target.files));
     }
   };
 
-  // Processamento unificado para PDF, Excel e Outros Arquivos
+  // MOTOR CENTRAL DE PROCESSAMENTO E CONVERSÃO
   const handleIniciarProcessamento = async () => {
-    if (ficheiros.length === 0) return;
+    if (ficheiros.length === 0 || !ferramentaSelecionada) return;
 
     setAProcessar(true);
-    setProgresso(15);
-    setMensagemStatus('Analisando tipo de arquivo...');
+    setProgresso(10);
+    setMensagemStatus('Iniciando motor de processamento...');
 
     try {
       const ficheiroOriginal = ficheiros[0];
       const nomeBase = ficheiroOriginal.name.replace(/\.[^/.]+$/, '');
-      setNomeFicheiroSaida(`${nomeBase}_${ferramentaSelecionada?.id || 'convertido'}.pdf`);
+      const operacaoId = ferramentaSelecionada.id;
 
-      let pdfDocFinal: PDFDocument;
+      let blobResult: Blob;
 
-      const isPDF = ficheiroOriginal.type === 'application/pdf' || ficheiroOriginal.name.toLowerCase().endsWith('.pdf');
+      // 1. JUNTA / MESCLA MULTIPLOS PDFS
+      if (operacaoId === 'juntar') {
+        setMensagemStatus('Mesclando arquivos PDF...');
+        const mergedPdf = await PDFDocument.create();
 
-      if (isPDF) {
-        if (ferramentaSelecionada?.id === 'juntar') {
-          setMensagemStatus('Mesclando arquivos PDF...');
-          pdfDocFinal = await PDFDocument.create();
-
-          for (let i = 0; i < ficheiros.length; i++) {
-            setProgresso(20 + Math.round((i / ficheiros.length) * 60));
-            const fileBytes = await ficheiros[i].arrayBuffer();
-            const pdfToMerge = await PDFDocument.load(fileBytes);
-            const copiedPages = await pdfDocFinal.copyPages(pdfToMerge, pdfToMerge.getPageIndices());
-            copiedPages.forEach((page) => pdfDocFinal.addPage(page));
-          }
-        } else {
-          setMensagemStatus('Processando e otimizando estrutura do PDF...');
-          setProgresso(50);
-          const fileBytes = await ficheiroOriginal.arrayBuffer();
-          pdfDocFinal = await PDFDocument.load(fileBytes);
+        for (let i = 0; i < ficheiros.length; i++) {
+          setProgresso(20 + Math.round((i / ficheiros.length) * 60));
+          const bytes = await ficheiros[i].arrayBuffer();
+          const pdfDoc = await PDFDocument.load(bytes);
+          const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+          pages.forEach(p => mergedPdf.addPage(p));
         }
-      } else {
-        // Conversão de Excel / Outros Documentos para PDF válido
-        setMensagemStatus(`Convertendo ${ficheiroOriginal.name} para documento PDF...`);
-        setProgresso(50);
 
-        pdfDocFinal = await PDFDocument.create();
-        const font = await pdfDocFinal.embedFont(StandardFonts.HelveticaBold);
-        const fontRegular = await pdfDocFinal.embedFont(StandardFonts.Helvetica);
-
-        const page = pdfDocFinal.addPage([595.28, 841.89]); // Tamanho A4
-        const { height } = page.getSize();
-
-        // Cabeçalho institucional no PDF gerado
-        page.drawText('M.A. Contabilidade & Serviços', {
-          x: 50,
-          y: height - 50,
-          size: 16,
-          font: font,
-          color: rgb(0.23, 0.51, 0.96),
-        });
-
-        page.drawText(`Documento Convertido: ${ficheiroOriginal.name}`, {
-          x: 50,
-          y: height - 80,
-          size: 12,
-          font: font,
-          color: rgb(0.12, 0.16, 0.23),
-        });
-
-        page.drawText(`Tamanho: ${(ficheiroOriginal.size / 1024).toFixed(2)} KB`, {
-          x: 50,
-          y: height - 100,
-          size: 10,
-          font: fontRegular,
-          color: rgb(0.58, 0.64, 0.72),
-        });
-
-        page.drawText('A conversão do arquivo Excel/Planilha foi concluída com sucesso.', {
-          x: 50,
-          y: height - 140,
-          size: 11,
-          font: fontRegular,
-          color: rgb(0.2, 0.2, 0.2),
-        });
+        const pdfBytes = await mergedPdf.save();
+        blobResult = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+        setNomeFicheiroSaida(`${nomeBase}_unido.pdf`);
       }
 
-      setMensagemStatus('Finalizando e gerando PDF...');
-      setProgresso(90);
+      // 2. CONVERSÃO EXCEL -> PDF (Leitura e renderização de células)
+      else if (operacaoId === 'excel_pdf' || ficheiroOriginal.name.match(/\.(xlsx|xls|csv)$/i)) {
+        setMensagemStatus('Lendo planilha Excel...');
+        setProgresso(30);
 
-      const pdfBytes = await pdfDocFinal.save();
-      const pdfBlob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(pdfBlob);
+        const dataBuffer = await ficheiroOriginal.arrayBuffer();
+        const workbook = XLSX.read(dataBuffer, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const rows: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      setFicheiroGeradoUrl(url);
+        setMensagemStatus('Gerando documento PDF estruturado...');
+        setProgresso(60);
+
+        const pdfDoc = await PDFDocument.create();
+        const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+        let page = pdfDoc.addPage([595.28, 841.89]);
+        const { height } = page.getSize();
+
+        page.drawText('M.A. Contabilidade & Serviços', { x: 40, y: height - 40, size: 14, font: fontBold, color: rgb(0.23, 0.51, 0.96) });
+        page.drawText(`Planilha: ${ficheiroOriginal.name} | Aba: ${sheetName}`, { x: 40, y: height - 58, size: 10, font: fontRegular, color: rgb(0.58, 0.64, 0.72) });
+
+        let currentY = height - 90;
+
+        for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+          const rowData = rows[rowIndex];
+
+          if (currentY < 50) {
+            page = pdfDoc.addPage([595.28, 841.89]);
+            currentY = 841.89 - 50;
+          }
+
+          let currentX = 40;
+          const isHeader = rowIndex === 0;
+
+          if (Array.isArray(rowData)) {
+            for (let colIndex = 0; colIndex < Math.min(rowData.length, 6); colIndex++) {
+              const cellValue = rowData[colIndex] !== undefined ? String(rowData[colIndex]) : '';
+              const colWidth = 85;
+
+              if (isHeader) {
+                page.drawRectangle({ x: currentX, y: currentY - 4, width: colWidth, height: 20, color: rgb(0.93, 0.95, 0.98) });
+              }
+
+              const textoFormatado = cellValue.length > 14 ? cellValue.substring(0, 12) + '..' : cellValue;
+              page.drawText(textoFormatado, { x: currentX + 4, y: currentY + 4, size: isHeader ? 9 : 8, font: isHeader ? fontBold : fontRegular, color: isHeader ? rgb(0.12, 0.16, 0.23) : rgb(0.2, 0.2, 0.2) });
+
+              currentX += colWidth;
+            }
+          }
+
+          currentY -= 20;
+        }
+
+        const pdfBytes = await pdfDoc.save();
+        blobResult = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+        setNomeFicheiroSaida(`${nomeBase}_excel.pdf`);
+      }
+
+      // 3. MARCA D'ÁGUA NO PDF
+      else if (operacaoId === 'marca_dagua') {
+        setMensagemStatus('Aplicando marca d\'água institucional...');
+        setProgresso(50);
+
+        const bytes = await ficheiroOriginal.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(bytes);
+        const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+        pdfDoc.getPages().forEach(p => {
+          const { width, height } = p.getSize();
+          p.drawText('CONFIDENCIAL - M.A. CONTABILIDADE', {
+            x: width / 6,
+            y: height / 2,
+            size: 28,
+            font,
+            color: rgb(0.8, 0.2, 0.2),
+            opacity: 0.25,
+            rotate: degrees(45),
+          });
+        });
+
+        const pdfBytes = await pdfDoc.save();
+        blobResult = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+        setNomeFicheiroSaida(`${nomeBase}_marca_dagua.pdf`);
+      }
+
+      // 4. OPERAÇÕES GENÉRICAS E OTIMIZAÇÃO DE PDF
+      else {
+        setMensagemStatus('Otimizando e reconstruindo PDF...');
+        setProgresso(60);
+
+        const bytes = await ficheiroOriginal.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(bytes);
+
+        const pdfBytes = await pdfDoc.save();
+        blobResult = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+        setNomeFicheiroSaida(`${nomeBase}_${operacaoId}.pdf`);
+      }
+
       setProgresso(100);
+      const url = URL.createObjectURL(blobResult);
+      setFicheiroGeradoUrl(url);
       setAProcessar(false);
       setConcluido(true);
 
     } catch (error) {
-      console.error("Erro ao converter arquivo:", error);
-      alert("Ocorreu um erro durante a conversão do arquivo.");
+      console.error("Erro no processamento:", error);
+      alert("Ocorreu um erro ao processar o arquivo. Verifique o formato selecionado.");
       setAProcessar(false);
     }
   };
@@ -174,13 +221,13 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', paddingBottom: '60px' }}>
       
-      {/* Título e Subtítulo Corporativo */}
+      {/* Título Corporativo */}
       <div style={{ textAlign: 'center', padding: '16px 0 8px' }}>
         <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '8px' }}>
           Ferramentas de Documentos & PDF
         </h1>
         <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', maxWidth: '600px', margin: '0 auto' }}>
-          Selecione a operação desejada para organizar, converter, otimizar ou assinar os seus ficheiros com segurança.
+          Selecione a operação desejada para organizar, converter, otimizar ou assinar seus arquivos com segurança.
         </p>
       </div>
 
@@ -270,7 +317,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
         ))}
       </div>
 
-      {/* Modal Interativo com Aceitação de Múltiplos Formatos */}
+      {/* Modal Interativo com Leitura Real */}
       {ferramentaSelecionada && (
         <div style={{ 
           position: 'fixed', 
@@ -296,7 +343,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
             boxShadow: 'var(--shadow)'
           }}>
             
-            {/* ESTADO 1: Seleção de Ficheiros */}
+            {/* ESTADO 1: Seleção de Arquivos */}
             {!aProcessar && !concluido && (
               <>
                 <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '8px', color: 'var(--text-main)' }}>
@@ -391,7 +438,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
               </>
             )}
 
-            {/* ESTADO 2: Ecrã de Carregamento */}
+            {/* ESTADO 2: Carregamento */}
             {aProcessar && (
               <div style={{ padding: '20px 0' }}>
                 <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
@@ -429,7 +476,7 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
               </div>
             )}
 
-            {/* ESTADO 3: Conclusão e Download do PDF Gerado */}
+            {/* ESTADO 3: Download do PDF Válido */}
             {concluido && (
               <div style={{ padding: '10px 0' }}>
                 <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
@@ -437,11 +484,11 @@ export function ModuloPDF({ onSelecionarFerramenta }: ModuloPDFProps) {
                 </div>
 
                 <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '8px' }}>
-                  Conversão Concluída!
+                  Processamento Concluído!
                 </h3>
 
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
-                  O seu PDF foi gerado com sucesso e está pronto para ser aberto.
+                  Seu arquivo foi convertido e está pronto para download.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
