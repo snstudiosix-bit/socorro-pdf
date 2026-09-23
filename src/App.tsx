@@ -21,7 +21,7 @@ export function App() {
           maxWidth: '1000px',
           margin: '0 auto',
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>
