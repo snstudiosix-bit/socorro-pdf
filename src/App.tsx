@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
+import { LandingContador } from './components/LandingContador';
 import { FormularioPedido } from './components/FormularioPedido';
+import { ServicosAdministrativos } from './components/ServicosAdministrativos';
 import { PainelAdmin } from './components/PainelAdmin';
 import { LoginAdmin } from './components/LoginAdmin';
 
 export function App() {
-  const [pagina, setPagina] = useState<'formulario' | 'admin'>('formulario');
+  const [pagina, setPagina] = useState<'contabilidade' | 'pdf' | 'admin_servicos' | 'admin'>('contabilidade');
   const [usuario, setUsuario] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [carregando, setCarregando] = useState<boolean>(true);
@@ -32,7 +34,7 @@ export function App() {
 
   const handleSair = async () => {
     await supabase.auth.signOut();
-    setPagina('formulario');
+    setPagina('contabilidade');
   };
 
   if (carregando) {
@@ -40,11 +42,12 @@ export function App() {
   }
 
   if (!usuario) {
-    return <LoginAdmin onLoginSucesso={() => setPagina('formulario')} />;
+    return <LoginAdmin onLoginSucesso={() => setPagina('contabilidade')} />;
   }
 
   return (
-    <div style={{ minHeight: '100vh' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Header / Navbar */}
       <header style={{
         backgroundColor: '#ffffff',
         borderBottom: '1px solid var(--border-color)',
@@ -55,38 +58,73 @@ export function App() {
         zIndex: 10
       }}>
         <div style={{
-          maxWidth: '1000px',
+          maxWidth: '1100px',
           margin: '0 auto',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          justify: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px'
         }}>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>
-            📄 Socorro PDF
+          <h1 
+            onClick={() => setPagina('contabilidade')}
+            style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', cursor: 'pointer' }}
+          >
+            📊 M.A. Contabilidade & Serviços
           </h1>
 
-          <nav style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <nav style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button
-              onClick={() => setPagina('formulario')}
+              onClick={() => setPagina('contabilidade')}
               style={{
-                padding: '8px 16px',
-                backgroundColor: pagina === 'formulario' ? 'var(--primary)' : 'transparent',
-                color: pagina === 'formulario' ? '#ffffff' : 'var(--text-muted)',
-                border: pagina === 'formulario' ? 'none' : '1px solid var(--border-color)',
+                padding: '8px 14px',
+                backgroundColor: pagina === 'contabilidade' ? 'var(--primary)' : 'transparent',
+                color: pagina === 'contabilidade' ? '#ffffff' : 'var(--text-muted)',
+                border: pagina === 'contabilidade' ? 'none' : '1px solid var(--border-color)',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontWeight: 600
               }}
             >
-              Novo Pedido
+              Contabilidade
+            </button>
+
+            <button
+              onClick={() => setPagina('pdf')}
+              style={{
+                padding: '8px 14px',
+                backgroundColor: pagina === 'pdf' ? 'var(--primary)' : 'transparent',
+                color: pagina === 'pdf' ? '#ffffff' : 'var(--text-muted)',
+                border: pagina === 'pdf' ? 'none' : '1px solid var(--border-color)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              Conversão de PDF
+            </button>
+
+            <button
+              onClick={() => setPagina('admin_servicos')}
+              style={{
+                padding: '8px 14px',
+                backgroundColor: pagina === 'admin_servicos' ? 'var(--primary)' : 'transparent',
+                color: pagina === 'admin_servicos' ? '#ffffff' : 'var(--text-muted)',
+                border: pagina === 'admin_servicos' ? 'none' : '1px solid var(--border-color)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              Serviços Administrativos
             </button>
 
             {isAdmin && (
               <button
                 onClick={() => setPagina('admin')}
                 style={{
-                  padding: '8px 16px',
-                  backgroundColor: pagina === 'admin' ? 'var(--primary)' : 'transparent',
+                  padding: '8px 14px',
+                  backgroundColor: pagina === 'admin' ? '#1e293b' : 'transparent',
                   color: pagina === 'admin' ? '#ffffff' : 'var(--text-muted)',
                   border: pagina === 'admin' ? 'none' : '1px solid var(--border-color)',
                   borderRadius: '8px',
@@ -117,12 +155,12 @@ export function App() {
         </div>
       </header>
 
-      <main style={{ maxWidth: '1000px', margin: '30px auto', padding: '0 16px' }}>
-        {pagina === 'admin' && isAdmin ? (
-          <PainelAdmin />
-        ) : (
-          <FormularioPedido />
-        )}
+      {/* Conteúdo Principal */}
+      <main style={{ flex: 1, maxWidth: '1100px', margin: '20px auto', padding: '0 16px', width: '100%' }}>
+        {pagina === 'contabilidade' && <LandingContador onIrParaPDF={() => setPagina('pdf')} />}
+        {pagina === 'pdf' && <FormularioPedido />}
+        {pagina === 'admin_servicos' && <ServicosAdministrativos />}
+        {pagina === 'admin' && isAdmin && <PainelAdmin />}
       </main>
     </div>
   );
