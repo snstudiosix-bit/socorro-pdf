@@ -70,14 +70,15 @@ export function PainelAdmin() {
       const fileName = `finalizado_${pedido.id}_${Date.now()}.${fileExt}`;
       const filePath = `trabalhos_prontos/${fileName}`;
 
+      // Corrigido para 'arquivos-pedidos' com hífen
       const { error: uploadError } = await supabase.storage
-        .from('arquivos_pedidos')
+        .from('arquivos-pedidos')
         .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       const { data: publicUrlData } = supabase.storage
-        .from('arquivos_pedidos')
+        .from('arquivos-pedidos')
         .getPublicUrl(filePath);
 
       const finalUrl = publicUrlData.publicUrl;
